@@ -45,17 +45,26 @@ def updated() {
 
 def initialize() {
 	state.lastColor = "#000000"
+    lights.setLevel(5)
+    lights.setHue(50)
+    lights.setSaturation(100)
+    lights.setColor(state.lastColor)
+    log.debug "Initializing... $state.lastColor"
 	getColor()
 }
 
 def getColor() {
-	htmlGet("http://api.thingspeak.com/channels/1417/field/2/last.txt") {
-    response ->
-    color = response.body
-	if (state.lastColor != color) {
-		lights.setColor(color)
-        state.lastColor = newColor
+	log.debug "lastColor: $state.lastColor"
+	try {
+		httpGet("http://api.thingspeak.com/channels/1417/field/2/last.json") { resp ->
+    		state.newColor = resp.data["field2"]
+			if (state.lastColor != state.newColor) {
+				lights.setColor(state.newColor)
+        		state.lastColor = state.newColor
+    		}
+			runIn(5, getColor)
     	}
-	runIn(5, getColor)
-    }
+	} catch (e) {
+    	log.error "oops: $e"
+	}
 }
