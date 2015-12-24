@@ -42,24 +42,39 @@ def updated() {
 
 	initialize()
 }
-
+	
 def initialize() {
-	state.lastColor = "#000000"
-    lights.setLevel(5)
-    lights.setHue(50)
-    lights.setSaturation(100)
-    lights.setColor(state.lastColor)
+
+	state.hsColorMap = [
+	"off": [level:1, hue:0, saturation:0],
+    "white": [level:50, hue:100, saturation:20],
+    "red": [level:100, hue:100, saturation:100],
+    "green": [level:100, hue:33, saturation:100],
+    "blue": [level:100, hue:67, saturation:100],
+    "yellow": [level:100, hue:12, saturation:100],
+    "orange": [level:100, hue:3, saturation:100],
+    "cyan": [level:100, hue:50, saturation:100],
+    "pink": [level:100, hue:100, saturation:90],
+    "purple": [level:100, hue:75, saturation:100],
+    "magenta": [level:100, hue:95, saturation:100],
+    "warmwhite": [level:50, hue:100, saturation:50],
+    "oldlace": [level:50, hue:100, saturation:50]
+    ]
+
+	state.lastColor = "off"
+    lights.setColor(state.hsColorMap[state.lastColor])
     log.debug "Initializing... $state.lastColor"
 	getColor()
 }
 
 def getColor() {
-	log.debug "lastColor: $state.lastColor"
+	log.debug "Color: $state.lastColor"
 	try {
-		httpGet("http://api.thingspeak.com/channels/1417/field/2/last.json") { resp ->
-    		state.newColor = resp.data["field2"]
+		httpGet("http://api.thingspeak.com/channels/1417/field/1/last.json") { resp ->
+    		state.newColor = resp.data["field1"]
 			if (state.lastColor != state.newColor) {
-				lights.setColor(state.newColor)
+            	log.debug "setting new color"
+				lights.setColor(state.hsColorMap[state.newColor])
         		state.lastColor = state.newColor
     		}
 			runIn(5, getColor)
