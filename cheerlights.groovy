@@ -1,4 +1,4 @@
-/**
+//**
  *  Cheerlights
  *
  *  Copyright 2015 Michael Koster
@@ -42,10 +42,11 @@ def updated() {
 
 	initialize()
 }
-	
+
 def initialize() {
 
-	state.hsColorMap = [
+	state.hsColorMap = 
+    [
 	"off": [level:1, hue:0, saturation:0],
     "white": [level:50, hue:100, saturation:20],
     "red": [level:100, hue:100, saturation:100],
@@ -77,7 +78,7 @@ def getColor() {
 				lights.setColor(state.hsColorMap[state.newColor])
         		state.lastColor = state.newColor
     		}
-			runIn(5, getColor)
+			runIn(30, getColor)
     	}
 	} catch (e) {
     	log.error "oops: $e"
